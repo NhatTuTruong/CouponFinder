@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coupon Finder</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>Coupon Finder</h1>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Chế độ xem">
+      <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="find" id="tab-btn-find">Tìm coupon</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-tab="history" id="tab-btn-history">Kết quả</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-tab="settings" id="tab-btn-settings">Cài đặt</button>
+    </nav>
+
+    <div id="license-banner" class="license-banner" hidden role="alert"></div>
+
+    <div id="tab-panel-find" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-find">
+      <section class="card search-card">
+        <label class="label" for="domain">Domain, URL shop hoặc tên brand</label>
+        <p class="hint muted">Mỗi dòng một mục · Tối đa 5 brand mỗi lần tìm</p>
+        <div class="row row-search">
+          <textarea
+            id="domain"
+            class="domain-input"
+            rows="4"
+            placeholder="nike.com&#10;https://www.adidas.com&#10;Hampstead Tea"
+            spellcheck="false"
+          ></textarea>
+          <div class="search-actions">
+            <button type="button" id="btn-search" class="btn primary">Tìm coupon</button>
+            <button type="button" id="btn-stop" class="btn ghost btn-stop" hidden>Dừng lại</button>
+          </div>
+        </div>
+        <div id="search-progress" class="search-progress" hidden>
+          <div class="search-progress-head">
+            <span id="search-progress-label" class="search-progress-label">Đang tìm…</span>
+            <span id="search-progress-pct" class="search-progress-pct">0%</span>
+          </div>
+          <div
+            id="search-progress-track"
+            class="search-progress-track"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <div id="search-progress-fill" class="search-progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+        <p id="meta" class="meta muted"></p>
+        <p id="error" class="error" hidden></p>
+      </section>
+
+      <section class="card" id="panel-results" hidden>
+        <div class="toolbar">
+          <h2>Kết quả (lần tìm hiện tại)</h2>
+          <div class="toolbar-actions">
+            <button type="button" id="btn-verify" class="btn accent" disabled>Verify đã chọn</button>
+          </div>
+        </div>
+        <div id="current-results-list" class="current-results-list"></div>
+      </section>
+
+      <section class="card" id="panel-verify" hidden>
+        <h2>Sau khi verify (Playwright)</h2>
+        <div class="table-wrap">
+          <table class="table" id="tbl-verify">
+            <thead>
+              <tr>
+                <th>Mã</th>
+                <th>Trạng thái</th>
+                <th>Giảm giá</th>
+                <th>Mô tả</th>
+                <th>Xác xuất</th>
+                <th>Độ tin cậy</th>
+                <th>Loại</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-panel-history" class="tab-panel" hidden role="tabpanel" aria-labelledby="tab-btn-history">
+      <section class="card history-card">
+        <h2>Lịch sử tìm kiếm</h2>
+        <div class="history-toolbar">
+          <input
+            type="search"
+            id="history-search"
+            class="history-search"
+            placeholder="Tìm theo URL shop hoặc tên brand…"
+            autocomplete="off"
+          />
+          <div class="history-date-wrap">
+            <button type="button" id="history-date-btn" class="btn ghost history-date-btn" aria-expanded="false">
+              Hôm nay
+            </button>
+            <div id="history-date-menu" class="history-date-menu" hidden>
+              <button type="button" class="history-date-opt" data-preset="today">Hôm nay</button>
+              <button type="button" class="history-date-opt" data-preset="yesterday">Hôm qua</button>
+              <button type="button" class="history-date-opt" data-preset="last7">7 ngày qua</button>
+              <button type="button" class="history-date-opt" data-preset="all">Tất cả ngày</button>
+              <label class="history-date-custom">
+                <span>Chọn ngày</span>
+                <input type="date" id="history-date-picker" />
+              </label>
+            </div>
+          </div>
+        </div>
+        <p id="history-filter-meta" class="history-filter-meta muted" hidden></p>
+        <div id="history-list" class="history-list"></div>
+        <p id="history-empty" class="muted">Chưa có lần tìm nào. Quay lại tab «Tìm coupon» và chạy tìm kiếm.</p>
+        <p id="history-no-match" class="muted" hidden>Không có bản ghi phù hợp bộ lọc.</p>
+        <nav id="history-pagination" class="history-pagination" hidden aria-label="Phân trang lịch sử">
+          <button type="button" id="history-prev" class="btn ghost" disabled>Trước</button>
+          <span id="history-page-info" class="history-page-info">Trang 1 / 1</span>
+          <button type="button" id="history-next" class="btn ghost" disabled>Sau</button>
+        </nav>
+      </section>
+    </div>
+
+    <div id="tab-panel-settings" class="tab-panel" hidden role="tabpanel" aria-labelledby="tab-btn-settings">
+      <section class="card settings-card">
+        <div class="toolbar">
+          <h2>Cài đặt (.env)</h2>
+          <div class="toolbar-actions">
+            <button type="button" id="btn-env-reload" class="btn ghost">Tải lại</button>
+            <button type="button" id="btn-env-save" class="btn primary">Lưu</button>
+          </div>
+        </div>
+        <p id="settings-env-path" class="settings-env-path muted"></p>
+        <p id="license-status" class="license-status muted"></p>
+        <p id="settings-msg" class="settings-msg" hidden></p>
+        <form id="settings-form" class="settings-form" autocomplete="off"></form>
+      </section>
+    </div>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

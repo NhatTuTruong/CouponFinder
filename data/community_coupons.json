@@ -1,0 +1,10 @@
+[
+  {
+    "brand": "DemoBrand",
+    "website": "https://example.com",
+    "code": "WELCOME10",
+    "description": "10% off for new customers",
+    "expires_at": null,
+    "source_url": "local://community"
+  }
+]

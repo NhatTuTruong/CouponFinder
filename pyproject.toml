@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coupon-finder"
+version = "0.1.0"
+description = "Tool tim coupon: thu thap -> lam sach -> verify thuc te -> phan loai -> cham diem -> cap nhat"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "typer>=0.12.0",
+  "pydantic>=2.8.0",
+  "pydantic-settings>=2.4.0",
+  "python-dotenv>=1.0.0",
+  "sqlmodel>=0.0.22",
+  "requests>=2.32.0",
+  "beautifulsoup4>=4.12.0",
+  "python-dateutil>=2.9.0",
+  "rapidfuzz>=3.9.0",
+  "playwright>=1.46.0",
+  "apscheduler>=3.10.0",
+  "apify-client>=1.8.0",
+]
+
+[project.optional-dependencies]
+build-exe = ["pyinstaller>=6.0"]
+
+[project.scripts]
+coupon-finder = "coupon_finder.cli:app"
+
+# Thư mục `data/` ở root không phải package Python — nếu không khai báo, setuptools
+# sẽ báo lỗi "Multiple top-level packages discovered: ['data', 'coupon_finder']".
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["coupon_finder*"]
+
+[tool.setuptools.package-data]
+coupon_finder = ["web_public/*.html", "web_public/*.css", "web_public/*.js"]
+
+[tool.uvicorn]
+factory = false
+
