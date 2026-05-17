@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('license_key', 64)->unique();
             $table->unsignedInteger('daily_search_limit')->default(500);
             $table->unsignedSmallInteger('max_machines')->default(2);
-            $table->timestamp('expires_at')->nullable();
+            $table->dateTime('expires_at')->nullable();
             $table->text('notes')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -24,8 +24,9 @@ return new class extends Migration
             $table->foreignId('license_id')->constrained('licenses')->cascadeOnDelete();
             $table->string('machine_id', 128);
             $table->string('machine_label', 255)->nullable();
-            $table->timestamp('first_seen_at');
-            $table->timestamp('last_seen_at');
+            // dateTime thay vì timestamp — MySQL 5.7/MariaDB chỉ cho 1 cột TIMESTAMP có default.
+            $table->dateTime('first_seen_at');
+            $table->dateTime('last_seen_at');
             $table->unique(['license_id', 'machine_id']);
         });
 
