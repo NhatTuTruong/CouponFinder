@@ -4,21 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Phục hồi khi migrate lỗi giữa chừng: bảng `licenses` đã tạo nhưng `license_machines` chưa.
+ * Dùng DATETIME nullable (không dùng TIMESTAMP).
+ */
 return new class extends Migration
 {
     public function up(): void
     {
         if (! Schema::hasTable('licenses')) {
-            Schema::create('licenses', function (Blueprint $table) {
-                $table->id();
-                $table->string('license_key', 64)->unique();
-                $table->unsignedInteger('daily_search_limit')->default(500);
-                $table->unsignedSmallInteger('max_machines')->default(2);
-                $table->dateTime('expires_at')->nullable();
-                $table->text('notes')->nullable();
-                $table->boolean('is_active')->default(true);
-                $table->timestamps();
-            });
+            return;
         }
 
         if (! Schema::hasTable('license_machines')) {
@@ -27,7 +22,6 @@ return new class extends Migration
                 $table->foreignId('license_id')->constrained('licenses')->cascadeOnDelete();
                 $table->string('machine_id', 128);
                 $table->string('machine_label', 255)->nullable();
-                // Nullable DATETIME — tương thích MySQL 5.7 / MariaDB (tránh lỗi TIMESTAMP default).
                 $table->dateTime('first_seen_at')->nullable();
                 $table->dateTime('last_seen_at')->nullable();
                 $table->unique(['license_id', 'machine_id']);
@@ -47,8 +41,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('license_daily_usage');
-        Schema::dropIfExists('license_machines');
-        Schema::dropIfExists('licenses');
+        // Không drop — migration phục hồi; rollback dùng migration gốc.
     }
 };
