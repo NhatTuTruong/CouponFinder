@@ -50,7 +50,33 @@
 
 <section class="card">
     <h2>Danh sách license</h2>
-    <p class="muted table-hint">Sửa trực tiếp các ô bên dưới rồi bấm <strong>Lưu</strong> trên từng dòng.</p>
+    <form method="get" action="{{ route('admin.licenses.index') }}" class="list-toolbar">
+        <div class="search-row">
+            <label for="q" class="sr-only">Tìm kiếm</label>
+            <input type="search" id="q" name="q" value="{{ $searchQ }}"
+                   placeholder="Tìm theo key hoặc ghi chú…" class="search-input" autocomplete="off">
+            <button type="submit" class="btn btn-primary">Tìm</button>
+            @if($searchQ !== '')
+                <a href="{{ route('admin.licenses.index', ['per_page' => $perPage]) }}" class="btn btn-ghost">Xóa lọc</a>
+            @endif
+        </div>
+        <div class="per-page-row">
+            <label for="per_page">Số dòng / trang</label>
+            <select id="per_page" name="per_page" onchange="this.form.submit()">
+                @foreach([10, 20, 50, 100] as $n)
+                    <option value="{{ $n }}" @selected($perPage === $n)>{{ $n }}</option>
+                @endforeach
+            </select>
+        </div>
+    </form>
+    <p class="muted table-hint">
+        Sửa trực tiếp các ô bên dưới rồi bấm <strong>Lưu</strong> trên từng dòng.
+        @if($searchQ !== '')
+            · Đang lọc: <strong>{{ $searchQ }}</strong> ({{ $licenses->total() }} kết quả)
+        @else
+            · Tổng {{ $licenses->total() }} license
+        @endif
+    </p>
     <div class="table-wrap">
         <table class="license-table">
             <thead>
@@ -112,23 +138,33 @@
                         <form id="{{ $formId }}" method="post" action="{{ route('admin.licenses.update', $license) }}">
                             @csrf
                             @method('PUT')
+                            @include('admin.licenses._list_redirect')
                             <button type="submit" class="btn btn-primary btn-sm">Lưu</button>
                         </form>
                         <form method="post" action="{{ route('admin.licenses.destroy', $license) }}"
                               onsubmit="return confirm('Xóa license {{ $license->license_key }}?')">
                             @csrf
                             @method('DELETE')
+                            @include('admin.licenses._list_redirect')
                             <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
                         </form>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="9" class="muted">Chưa có license.</td></tr>
+                <tr>
+                    <td colspan="9" class="muted">
+                        @if($searchQ !== '')
+                            Không tìm thấy license khớp «{{ $searchQ }}».
+                        @else
+                            Chưa có license.
+                        @endif
+                    </td>
+                </tr>
             @endforelse
             </tbody>
         </table>
     </div>
-    {{ $licenses->links() }}
+    {{ $licenses->links('pagination.licenses') }}
 </section>
 
 @push('head')

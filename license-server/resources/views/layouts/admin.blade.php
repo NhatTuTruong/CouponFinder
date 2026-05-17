@@ -136,6 +136,102 @@
             margin-bottom: 20px;
         }
         .header-row h1 { margin: 0; }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+        .list-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 12px 20px;
+            margin-bottom: 12px;
+        }
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 260px;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            max-width: 420px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .per-page-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+        .per-page-row select {
+            padding: 7px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .pagination-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .pagination-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+        }
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .page-btn:hover:not(.disabled):not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            font-weight: 600;
+        }
+        .page-btn.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .page-ellipsis {
+            padding: 0 6px;
+            color: var(--muted);
+        }
+        .pagination-meta { font-size: 13px; }
     </style>
     @stack('head')
 </head>

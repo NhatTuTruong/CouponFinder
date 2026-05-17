@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     # Dùng Chrome/Edge cài trên máy (vd: chrome, msedge) — đôi khi qua Cloudflare tốt hơn Chromium bundled
     playwright_channel: str | None = None
     verify_timeout_ms: int = 35_000
+    # Scrape Simply Codes / TenereTeam (ngắn hơn verify — tránh chờ lâu khi không có mã)
+    scrape_timeout_ms: int = 18_000
+    scrape_btn_wait_ms: int = 6_000
+    scrape_max_scroll_rounds: int = 6
     # Verify coupon: mở URL sản phẩm cố định rồi thử «Add to cart» trước khi tìm ô mã (mỗi shop cần URL riêng)
     verify_seed_product_url: str | None = None
     # CSS nút thêm giỏ — để trống thì thử vài selector + nút theo chữ (Shopify/Woo/…)
@@ -80,10 +84,13 @@ class Settings(BaseSettings):
 
     # Apify — Google Search Results / Actor tuỳ chỉnh (cần COUPON_FINDER_APIFY_TOKEN)
     apify_token: str | None = None
+    apify_token_backup: str | None = None
     apify_actor_id: str = "nFJndFXA5zjCTuudP"
     # Mỗi lần gọi Actor: 1 query, 1 trang Google, tối đa N organic (tiết kiệm Usage)
     apify_max_pages_per_query: int = 1
     apify_results_per_page: int = 5
+    # Chờ tối đa Apify Actor (giây) — giảm khi brand không có kết quả (mặc định 120 thay vì 300)
+    apify_wait_secs: int = 120
     # True = nhiều dòng query (6+ lần search / run — tốn credit); False = gộp 1 câu
     apify_multi_query: bool = False
     apify_country_code: str = "us"

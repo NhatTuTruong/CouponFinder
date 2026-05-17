@@ -13,12 +13,24 @@ use Illuminate\View\View;
 
 class LicenseAdminController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $licenses = License::query()
+        $q = trim((string) $request->input('q', ''));
+        $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
+
+        $query = License::query()
             ->withCount('machines')
-            ->orderByDesc('id')
-            ->paginate(20);
+            ->orderByDesc('id');
+
+        if ($q !== '') {
+            $like = '%'.$q.'%';
+            $query->where(function ($builder) use ($like) {
+                $builder->where('license_key', 'like', $like)
+                    ->orWhere('notes', 'like', $like);
+            });
+        }
+
+        $licenses = $query->paginate($perPage)->withQueryString();
 
         $today = Carbon::today()->toDateString();
         $usageToday = LicenseDailyUsage::query()
@@ -29,7 +41,19 @@ class LicenseAdminController extends Controller
             'licenses' => $licenses,
             'generatedKey' => License::generateKey(),
             'usageToday' => $usageToday,
+            'searchQ' => $q,
+            'perPage' => $perPage,
         ]);
+    }
+
+    /** @return array<string, mixed> */
+    private function listRedirectParams(Request $request): array
+    {
+        return array_filter([
+            'q' => $request->input('return_q'),
+            'page' => $request->input('return_page'),
+            'per_page' => $request->input('return_per_page'),
+        ], static fn ($v) => $v !== null && $v !== '');
     }
 
     public function store(Request $request): RedirectResponse
@@ -52,7 +76,7 @@ class LicenseAdminController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('admin.licenses.index')
+        return redirect()->route('admin.licenses.index', $this->listRedirectParams($request))
             ->with('success', 'Đã tạo license.');
     }
 
@@ -74,26 +98,26 @@ class LicenseAdminController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        return redirect()->route('admin.licenses.index')
+        return redirect()->route('admin.licenses.index', $this->listRedirectParams($request))
             ->with('success', "Đã cập nhật license {$license->license_key}.");
     }
 
-    public function destroy(License $license): RedirectResponse
+    public function destroy(Request $request, License $license): RedirectResponse
     {
         $license->delete();
 
-        return redirect()->route('admin.licenses.index')
+        return redirect()->route('admin.licenses.index', $this->listRedirectParams($request))
             ->with('success', 'Đã xóa license.');
     }
 
-    public function removeMachine(License $license, LicenseMachine $machine): RedirectResponse
+    public function removeMachine(Request $request, License $license, LicenseMachine $machine): RedirectResponse
     {
         if ($machine->license_id !== $license->id) {
             abort(404);
         }
         $machine->delete();
 
-        return redirect()->route('admin.licenses.index')
+        return redirect()->route('admin.licenses.index', $this->listRedirectParams($request))
             ->with('success', 'Đã gỡ máy khỏi license.');
     }
 

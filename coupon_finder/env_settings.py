@@ -44,7 +44,14 @@ UI_ENV_FIELDS: tuple[EnvFieldSpec, ...] = (
         "Apify token",
         "Apify & tìm kiếm",
         "secret",
-        "Bắt buộc để tìm coupon qua Google (Apify). Để trống khi lưu = giữ token hiện tại.",
+        "Token chính. Để trống khi lưu = giữ token hiện tại.",
+    ),
+    EnvFieldSpec(
+        "apify_token_backup",
+        "Apify token (dự phòng)",
+        "Apify & tìm kiếm",
+        "secret",
+        "Tự dùng khi token chính lỗi hoặc hết quota. Để trống khi lưu = giữ giá trị hiện tại.",
     ),
     EnvFieldSpec(
         "only_simplycodes",

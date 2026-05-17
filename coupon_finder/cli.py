@@ -141,7 +141,10 @@ def doctor():
     typer.echo(f"project_root: {_PROJECT_ROOT}")
     typer.echo(f"dotenv_file: {_DOTENV} (exists={_DOTENV.is_file()})")
     typer.echo(f"cwd: {os.getcwd()}")
-    typer.echo(f"apify_token_loaded: {bool((settings.apify_token or '').strip())}")
+    from coupon_finder.apify_tokens import apify_tokens_configured
+
+    tokens = apify_tokens_configured()
+    typer.echo(f"apify_tokens_loaded: {len(tokens)} (primary={'yes' if tokens else 'no'}, backup={'yes' if len(tokens) > 1 else 'no'})")
     typer.echo(f"serpapi_key_loaded: {bool((settings.serpapi_key or '').strip())}")
     typer.echo(
         "google_cse_loaded: "
